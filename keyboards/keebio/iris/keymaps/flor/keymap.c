@@ -1,5 +1,6 @@
 
 #include QMK_KEYBOARD_H
+#include "color.h"
 
 enum custom_layer {
     _MAIN,
@@ -29,11 +30,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //┌────────┬────────┬────────┬────────┬────────┬────────┐                          ┌────────┬────────┬────────┬────────┬────────┬────────┐
      KC_TILD, KC_EXLM, KC_AT,   KC_HASH, KC_DLR,  KC_PERC,                            KC_CIRC, KC_AMPR, KC_ASTR, KC_LPRN, KC_RPRN, KC_EQL,
   //├────────┼────────┼────────┼────────┼────────┼────────┤                          ├────────┼────────┼────────┼────────┼────────┼────────┤
-     _______, KC_1,    KC_2,    KC_3,    KC_4,    KC_5,                               KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    _______,
+     _______, KC_1,    KC_2,    KC_3,    KC_4,    KC_5,                               KC_6,    KC_7,    KC_8,    KC_LBRC, KC_LBRC, _______,
   //├────────┼────────┼────────┼────────┼────────┼────────┤                          ├────────┼────────┼────────┼────────┼────────┼────────┤
      KC_DEL,  _______, KC_LEFT, KC_RGHT, KC_UP,   KC_LBRC,                      C(KC_LEFT), C(KC_DOWN), C(KC_UP), C(KC_RGHT), KC_PLUS, KC_PIPE,
   //├────────┼────────┼────────┼────────┼────────┼────────┼────────┐        ┌────────┼────────┼────────┼────────┼────────┼────────┼────────┤
-     BL_STEP, _______, _______, _______, KC_DOWN, KC_LCBR, KC_LPRN,          TG(_FN3), KC_RCBR, KC_P1,   KC_P2,   KC_P3,   KC_MINS, _______,
+     BL_STEP, _______, _______, _______, KC_DOWN, KC_LCBR, KC_LPRN,         TG(_FN3), KC_RCBR, KC_P1,   KC_P2,   KC_P3,   KC_MINS, _______,
   //└────────┴────────┴────────┴───┬────┴───┬────┴───┬────┴───┬────┘        └───┬────┴───┬────┴───┬────┴───┬────┴────────┴────────┴────────┘
                                     _______, _______, _______,                   _______, _______, KC_P0
                                 // └────────┴────────┴────────┘                 └────────┴────────┴────────┘
@@ -72,11 +73,24 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 // Shift + esc = ~
 const key_override_t tilde_esc_override = ko_make_basic(MOD_MASK_SHIFT, KC_ESC, S(KC_GRV));
-
 // GUI + esc = `
 const key_override_t grave_esc_override = ko_make_basic(MOD_MASK_GUI, KC_ESC, KC_GRV);
 
-const key_override_t **key_overrides = (const key_override_t *[]){&tilde_esc_override, &grave_esc_override, NULL};
+// MacOS move desktops with Ctrl-HJKL
+const key_override_t nav_left_override  = ko_make_basic(MOD_MASK_CTRL, KC_H, C(KC_LEFT));
+const key_override_t nav_down_override  = ko_make_basic(MOD_MASK_CTRL, KC_J, C(KC_DOWN));
+const key_override_t nav_up_override    = ko_make_basic(MOD_MASK_CTRL, KC_K, C(KC_UP));
+const key_override_t nav_right_override = ko_make_basic(MOD_MASK_CTRL, KC_L, C(KC_RGHT));
+
+const key_override_t **key_overrides = (const key_override_t *[]){
+    &tilde_esc_override, //
+    &grave_esc_override, //
+    &nav_left_override,  //
+    &nav_up_override,    //
+    &nav_down_override,  //
+    &nav_right_override, //
+    NULL,
+};
 
 /*
  * kb crashes when I set all LEDs on, probably drawing too much current
@@ -105,20 +119,11 @@ const key_override_t **key_overrides = (const key_override_t *[]){&tilde_esc_ove
  *             |--|62|--|    |--|28|--|
  */
 
-const int max_brightness = 160;
-// Light LEDs 6 to 9 and 12 to 15 red when caps lock is active. Hard to ignore!
-const rgblight_segment_t PROGMEM led_fn1[] = RGBLIGHT_LAYER_SEGMENTS({0, 68, 0, 255, max_brightness} // RED Light 62 LEDs, starting with LED 0
-);
-// Light LEDs 9 & 10 in cyan when keyboard layer 1 is active
-const rgblight_segment_t PROGMEM led_fn2[] = RGBLIGHT_LAYER_SEGMENTS({0, 68, 170, 255, max_brightness} // BLUE
-);
-// Light LEDs 11 & 12 in purple when keyboard layer 2 is active
-const rgblight_segment_t PROGMEM led_fn3[] = RGBLIGHT_LAYER_SEGMENTS({0, 68, 85, 255, max_brightness});
-// Light LEDs 13 & 14 in green when keyboard layer 3 is active
-const rgblight_segment_t PROGMEM led_default[] = RGBLIGHT_LAYER_SEGMENTS({0, 68, 128, 255, max_brightness} // TEAL
-);
+const rgblight_segment_t PROGMEM led_fn1[]     = RGBLIGHT_LAYER_SEGMENTS({0, 68, LASER_INDIGO});
+const rgblight_segment_t PROGMEM led_fn2[]     = RGBLIGHT_LAYER_SEGMENTS({0, 68, LASER_MAGENTA});
+const rgblight_segment_t PROGMEM led_fn3[]     = RGBLIGHT_LAYER_SEGMENTS({0, 68, LASER_CYAN});
+const rgblight_segment_t PROGMEM led_default[] = RGBLIGHT_LAYER_SEGMENTS({0, 68, LASER_RED});
 
-// Now define the array of layers. Later layers take precedence
 const rgblight_segment_t *const PROGMEM my_rgb_layers[] = RGBLIGHT_LAYERS_LIST(led_default, led_fn1, led_fn2, led_fn3);
 
 void keyboard_post_init_user(void) {

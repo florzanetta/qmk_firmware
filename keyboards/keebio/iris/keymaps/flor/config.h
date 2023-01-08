@@ -4,3 +4,8 @@
 #define RGBLIGHT_LAYERS
 #undef RGBLIGHT_LIMIT_VAL
 #define RGBLIGHT_LIMIT_VAL 160 /* The maximum brightness level */
+#undef RGBLIGHT_DEFAULT_VAL
+#define RGBLIGHT_DEFAULT_VAL RGBLIGHT_LIMIT_VAL
+// space saving
+#define NO_ACTION_MACRO
+#define NO_ACTION_FUNCTION
